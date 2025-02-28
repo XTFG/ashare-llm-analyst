@@ -13,7 +13,7 @@ jobs:
       # 🔧 新增关键步骤：替换占位符
       - name: Inject API Key
         run: |
-          sed -i "s/{Replace with your Key}/${ secrets.DEEPSEEK_API_KEY }/g" main.py
+          sed -i "s/{Replace with your Key}/${{ secrets.DEEPSEEK_API_KEY }}/g" main.py
         shell: bash
 
       - name: Verify Replacement
