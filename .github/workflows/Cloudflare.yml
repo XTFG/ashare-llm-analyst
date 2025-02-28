@@ -10,6 +10,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # 🔧 新增关键步骤：替换占位符
+      - name: Inject API Key
+        run: |
+          sed -i "s/{Replace with your Key}/${ secrets.DEEPSEEK_API_KEY }/g" main.py
+        shell: bash
+
+      - name: Verify Replacement
+        run: |
+          if grep -q "${{ secrets.DEEPSEEK_API_KEY }}" main.py; then
+            echo "✅ API Key replacement successful"
+          else
+            echo "❌ Replacement failed"
+            exit 1
+          fi
+          
       # 设置 Python 环境
       - uses: actions/setup-python@v4
         with:
