@@ -612,7 +612,7 @@ class StockAnalyzer:
 
 if __name__ == "__main__":
     stock_info = {
-        '上证指数': 'sh000001'
+        '天士力': 'sh600535'
     }
     analyzer = StockAnalyzer(stock_info)
     report_path = analyzer.run_analysis()
