@@ -39,8 +39,8 @@ jobs:
 
       # 部署到 Cloudflare
       - name: Deploy to Cloudflare Workers
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/wrangler-action@3.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy ./worker.js --name ashare-llm-analyst --compatibility-date 2023-03-14 --assets public
+          command: deploy ./worker.js --name ashare-llm-analyst --compatibility-date 2025-03-01 --assets public
