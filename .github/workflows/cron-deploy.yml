@@ -1,0 +1,42 @@
+name: Cron Deploy
+on:
+  schedule:
+    - cron: '00 8 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Create and push empty commit with date tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          DATE_TAG=$(date +'%Y%m%d')
+          
+          # 确保我们在 master 分支上
+          git checkout master
+          
+          # 创建空提交
+          git commit --allow-empty -m "chore: trigger build ${DATE_TAG}"
+          
+          # 创建标签
+          git tag -a "${DATE_TAG}" -m "Build trigger on ${DATE_TAG}"
+          
+          # 推送提交和标签
+          git push origin master
+          git push origin "${DATE_TAG}"

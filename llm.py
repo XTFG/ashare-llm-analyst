@@ -1,4 +1,5 @@
 import json
+import os
 from typing import Dict, Any, Optional
 
 import openai
@@ -352,25 +353,27 @@ class APIBusyError(Exception):
     pass
 
 
-class DeepseekAnalyzer:
-    """使用 OpenAI SDK 与 Deepseek API 交互的类"""
+class LLMAnalyzer:
+    """使用 OpenAI SDK 与 llm API 交互的类"""
 
-    def __init__(self, api_key: str, base_url: str = "https://api.deepseek.com"):
+    def __init__(self, api_key: str, base_url: str, model: str = None):
         """
-        初始化 Deepseek 分析器
+        初始化 llm 分析器
 
         Args:
-            api_key (str): Deepseek API 密钥
-            base_url (str): Deepseek API 基础 URL
+            api_key (str): llm API 密钥
+            base_url (str): llm API 基础 URL
+            model (str): 使用的模型名称，默认为None则使用环境变量或空字符串
         """
         self.client = OpenAI(
             api_key=api_key,
             base_url=base_url
         )
+        self.model = model or os.environ.get('LLM_MODEL', '')
 
     def request_analysis(self, df: pd.DataFrame, technical_indicators: pd.DataFrame) -> Optional[Dict[str, Any]]:
         """
-        向 Deepseek API 发送分析请求
+        向 llm API 发送分析请求
 
         Args:
             df (pd.DataFrame): 原始股票数据
@@ -398,7 +401,7 @@ class DeepseekAnalyzer:
             print("开始发送API请求...")
             try:
                 response = self.client.chat.completions.create(
-                    model="deepseek-chat",
+                    model=self.model,
                     messages=messages,
                     temperature=1.0,
                     stream=False

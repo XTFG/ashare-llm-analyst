@@ -11,7 +11,7 @@ import numpy as np
 
 import Ashare as as_api
 import MyTT as mt
-from Deepseek import DeepseekAnalyzer
+from llm import LLMAnalyzer
 
 
 def generate_trading_signals(df):
@@ -96,15 +96,16 @@ def _generate_table_row(key, value):
 
 
 class StockAnalyzer:
-    def __init__(self, _stock_info, count=120, deepseek_api_key='{Replace with your Key}', deepseek_base_url="https://api.deepseek.com"):
+    def __init__(self, _stock_info, count=120, llm_api_key=None, llm_base_url=None, llm_model=None):
         """
         初始化股票分析器
 
         Args:
             _stock_info: 股票信息字典
             count: 获取的数据条数
-            deepseek_api_key: Deepseek API密钥
-            deepseek_base_url: Deepseek API基础URL
+            llm_api_key: llm API密钥，默认从环境变量LLM_API_KEY获取
+            llm_base_url: llm API基础URL，默认从环境变量LLM_BASE_URL获取
+            llm_model: llm 模型名称，默认从环境变量LLM_MODEL获取
         """
         self.stock_codes = list(_stock_info.values())
         self.stock_names = _stock_info
@@ -113,8 +114,13 @@ class StockAnalyzer:
         plt.rcParams['font.sans-serif'] = ['SimHei']
         plt.rcParams['axes.unicode_minus'] = False
 
-        # 初始化Deepseek分析器
-        self.deepseek = DeepseekAnalyzer(deepseek_api_key, deepseek_base_url) if deepseek_api_key else None
+        # 从环境变量获取API密钥和基础URL
+        self.llm_api_key = llm_api_key or os.environ.get('LLM_API_KEY')
+        self.llm_base_url = llm_base_url or os.environ.get('LLM_BASE_URL')
+        self.llm_model = llm_model or os.environ.get('LLM_MODEL')
+
+        # 初始化llm分析器
+        self.llm = LLMAnalyzer(self.llm_api_key, self.llm_base_url, self.llm_model) if self.llm_api_key else None
 
     def get_stock_name(self, code):
         """根据股票代码获取股票名称"""
@@ -422,9 +428,9 @@ class StockAnalyzer:
 
         """添加AI分析结果"""
         # 获取原有的分析数据
-        if self.deepseek:
+        if self.llm:
             try:
-                api_result = self.deepseek.request_analysis(df, latest_df)
+                api_result = self.llm.request_analysis(df, latest_df)
                 if api_result:
                     analysis_data.update(api_result)
             except Exception as e:
